@@ -1,3 +1,4 @@
+import { GRAVITY } from './physics';
 export interface Particle {
   x: number; y: number; vx: number; vy: number;
   life: number; max: number; color: string; size: number;
@@ -13,7 +14,7 @@ export class Particles {
       const s = speed * (0.3 + Math.random() * 0.7);
       this.list.push({
         x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - speed * 0.4,
-        life: 0, max: 0.4 + Math.random() * 0.5, color, size: Math.random() < 0.3 ? 2 : 1, grav: 300, fade: true,
+        life: 0, max: 0.4 + Math.random() * 0.5, color, size: Math.random() < 0.3 ? 2 : 1, grav: GRAVITY, fade: true,
         ...opts,
       });
     }

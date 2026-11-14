@@ -13,11 +13,11 @@ export class PlanetRenderer {
   private th = 128;
   private map: Float32Array; // per-pixel [u, v, shade] or -1
 
-  constructor(public R: number) {
+  constructor(public R: number, palette: 'kepler' | 'mars' = 'mars') {
     const size = R * 2 + 8;
     [this.canvas, this.ctx] = makeCanvas(size, size);
     this.img = this.ctx.createImageData(size, size);
-    this.tex = buildPlanetTexture(this.tw, this.th);
+    this.tex = buildPlanetTexture(this.tw, this.th, palette);
     this.map = new Float32Array(size * size * 3).fill(-1);
     const c = size / 2;
     const lx = -0.55, ly = -0.45, lz = 0.7;
@@ -48,7 +48,7 @@ export class PlanetRenderer {
         if (dist < 1.06) {
           const a = (1.06 - dist) / 0.06;
           const th = BAYER[(y % 4) * 4 + (x % 4)] / 16;
-          if (a > th) { d[i] = 120; d[i + 1] = 200; d[i + 2] = 255; d[i + 3] = 150; continue; }
+          if (a > th) { d[i] = 255; d[i + 1] = 180; d[i + 2] = 140; d[i + 3] = 140; continue; }
         }
         d[i + 3] = 0;
         continue;
@@ -64,10 +64,8 @@ export class PlanetRenderer {
       let r = this.tex[ti] * f, g = this.tex[ti + 1] * f, b = this.tex[ti + 2] * f;
       // night side gets a faint violet tint, rim gets atmosphere
       const rim = 1 - Math.sqrt(Math.max(0, 1 - ((x + 0.5 - c) ** 2 + (y + 0.5 - c) ** 2) / (this.R * this.R)));
-      if (rim > 0.72 && shade > 0.05) { r = r * 0.6 + 60; g = g * 0.6 + 120; b = b * 0.6 + 160; }
+      if (rim > 0.72 && shade > 0.05) { r = r * 0.6 + 110; g = g * 0.6 + 90; b = b * 0.6 + 80; }
       if (f <= 0.12) { r += 14; g += 6; b += 30; }
-      // city-like bioluminescent dots on the dark side
-      if (f <= 0.12 && this.tex[ti + 1] > 200 && ((tx * 7 + ty * 13) % 23 === 0)) { r = 120; g = 255; b = 220; }
       d[i] = r; d[i + 1] = g; d[i + 2] = b; d[i + 3] = 255;
     }
     this.ctx.putImageData(this.img, 0, 0);

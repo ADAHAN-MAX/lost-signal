@@ -72,7 +72,7 @@ export function buildMoon(): Canv {
 }
 
 /** Sphere texture data for the rotating menu planet. */
-export function buildPlanetTexture(w: number, h: number): Uint8ClampedArray {
+export function buildPlanetTexture(w: number, h: number, palette: 'kepler' | 'mars' = 'kepler'): Uint8ClampedArray {
   const data = new Uint8ClampedArray(w * h * 3);
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
@@ -83,11 +83,19 @@ export function buildPlanetTexture(w: number, h: number): Uint8ClampedArray {
       const n = a * (1 - t) + b * t;
       const lat = Math.abs(y / h - 0.5) * 2;
       let r: number, g: number, bb: number;
+      if (palette === 'mars') {
+        if (n > 0.6) { r = 236; g = 150; bb = 100; } // bright dusty highlands
+        else if (n > 0.5) { r = 200; g = 96; bb = 58; }
+        else if (n > 0.42) { r = 160; g = 70; bb = 44; }
+        else { r = 110; g = 48; bb = 40; } // dark basins
+        if (lat > 0.84) { r = 245; g = 240; bb = 250; } // ice caps
+      } else {
       if (n > 0.58) { r = 70; g = 214; bb = 190; } // teal biolum. continents
       else if (n > 0.5) { r = 74; g = 47; bb = 92; } // purple lowlands
       else if (n > 0.42) { r = 96; g = 72; bb = 160; }
       else { r = 40; g = 34; bb = 98; } // deep violet seas
       if (lat > 0.82) { r = 200; g = 210; bb = 255; }
+      }
       const swirl = noise2(x * 0.08, y * 0.4, 99);
       if (swirl > 0.72) { r = (r + 230) / 2; g = (g + 220) / 2; bb = (bb + 255) / 2; }
       const i = (y * w + x) * 3;

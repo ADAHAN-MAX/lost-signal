@@ -3,20 +3,21 @@ import { drawText, measure } from './font';
 
 export const SPLASHES = [
   'Ready for liftoff?',
-  'One planet. Ten days. One chance.',
-  'Houston, we have a problem!',
-  'Survive the unknown!',
-  'Your journey begins here!',
+  'Lots of science!',
+  'NOVA says hi!',
+  'Hello from Mars!',
+  'Hello, explorer!',
+  'Mind the dust!',
 ];
 
 interface Shooting { x: number; y: number; vx: number; vy: number; life: number }
 
-/** Animated main-menu backdrop: Kepler-186f, drifting stars, shooting stars, title + splash. */
+/** Animated main-menu backdrop: Mars, drifting stars, shooting stars, title + splash. */
 export class MenuScene {
   private ctx: CanvasRenderingContext2D;
   private W = 480;
   private H = 270;
-  private planet = new PlanetRenderer(120);
+  private planet = new PlanetRenderer(120, 'mars');
   private stars: Star[] = makeStars(220);
   private shooting: Shooting[] = [];
   private t = 0;
@@ -106,8 +107,8 @@ export class MenuScene {
     const px = Math.round(W * 0.62), py = Math.round(H * 0.42);
     // glow behind
     const rg = ctx.createRadialGradient(px + pc.width / 2, py + pc.height / 2, 100, px + pc.width / 2, py + pc.height / 2, 190);
-    rg.addColorStop(0, 'rgba(90,160,255,0.25)');
-    rg.addColorStop(1, 'rgba(90,160,255,0)');
+    rg.addColorStop(0, 'rgba(255,150,100,0.22)');
+    rg.addColorStop(1, 'rgba(255,150,100,0)');
     ctx.fillStyle = rg;
     ctx.fillRect(0, 0, W, H);
     ctx.drawImage(pc, px, py);
@@ -121,7 +122,7 @@ export class MenuScene {
       ctx.fillStyle = '#b9b0e0';
       ctx.fillRect(Math.round(mx) - 3, Math.round(my) - 3, 3, 3);
     }
-    drawText(ctx, 'KEPLER-186F', px + pc.width / 2, py + pc.height - 8, { align: 'center', color: '#6a5ea0', shadow: null, alpha: 0.6 });
+    drawText(ctx, 'MARS', px + pc.width / 2, py + pc.height - 8, { align: 'center', color: '#c07a5a', shadow: null, alpha: 0.7 });
 
     if (this.showTitle) this.drawTitle();
   }
@@ -148,7 +149,8 @@ export class MenuScene {
     drawText(ctx, title, x, y, { scale, color: '#b49cff', shadow: null });
     ctx.restore();
     // subtitle
-    drawText(ctx, '10 DAYS', W / 2, y + 8 * scale + 6, { align: 'center', scale: 2, color: '#43d9ff', shadow: '#0b2a44' });
+    drawText(ctx, 'SURVIVE THE UNKNOWN.', W / 2, y + 8 * scale + 6, { align: 'center', scale: 1, color: '#43d9ff', shadow: '#0b2a44' });
+    drawText(ctx, 'PROTECT WHAT YOU DISCOVER.', W / 2, y + 8 * scale + 17, { align: 'center', scale: 1, color: '#ffc896', shadow: '#3a1a10' });
     // splash text
     ctx.save();
     const pulse = 1 + Math.abs(Math.sin(this.t * 4)) * 0.08;

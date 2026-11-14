@@ -1,45 +1,74 @@
-# LOST SIGNAL: 10 DAYS
+# LOST SIGNAL — A Mars Scientific Adventure
 
-A 2D pixel-art survival game for the browser. Crash on Kepler-186f, repair the transmitter, send an SOS and survive ten days until rescue.
+*Survive the storm. Read the rocks. Send your science home.*
+
+A 2D pixel-art science adventure for explorers aged 7–12, made for the NASA Space Apps Challenge 2026. A dust storm has damaged the fictional ARES-7 research base on Mars. With NOVA, a friendly robot, you repair the base over ten mission days (sols), play five science mini-games to earn energy, explore the Martian surface, study real kinds of Mars rock, and send your research and a final signal home to Earth.
+
+Mars is real and the science is based on real space research. ARES-7, the astronaut, NOVA and the story are fictional, and environmental readings are simulated for gameplay. This is an independent educational project, not an official NASA game.
 
 ## Run it
 
 ```bash
 npm install
-npm run dev      # http://localhost:5173
-npm run build    # production build in dist/
+npm run dev          # http://localhost:5173
+npm run build        # production build in dist/
+npm run standalone   # one self-contained file: dist-standalone/index.html
 ```
-
-`node scripts/build-standalone.mjs` produces a single self-contained `dist-standalone/index.html` (works offline except for the Google pixel fonts, which fall back to monospace).
 
 ## Controls
 
-A/D move · W/Space jump · Shift sprint · E interact (hold to repair) · Left mouse mine/attack/place/use · Right mouse place/use · 1–9 or wheel hotbar · I/Tab inventory & crafting · Esc pause.
+| Key | Action |
+|---|---|
+| A / D or ← → | Walk (and fly the scout drone) |
+| W / Space / ↑ | Jump (Mars gravity: higher, slower jumps). Climb with the drone |
+| S / ↓ | Sink with the drone |
+| E | Use, talk, pick up. Hold E to scan or collect rock samples |
+| Click / tap | Use the thing you point at; all buttons |
+| Esc | Pause |
 
-## Structure
+On touch screens, on-screen ◀ ▶ ▲ E buttons appear automatically (Settings → Touch buttons can force them on or off).
+
+## What's in the game
+
+- **About screen** on the very first launch (stored in LocalStorage), reopened from **ABOUT THE GAME** in the main menu.
+- **Opening cinematic** (~64 s + an in-game wake-up scene): journey to Mars, landing, meeting NOVA, the dust storm. Has a Skip Intro button.
+- **The base**: nine side-view rooms (Science Lab, Airlock, Workshop, Command Center, Power Room, Life Support, Greenhouse, Radiation Shelter, Comm Room).
+- **Mars gravity everywhere**: one gravity constant, 3.71 m/s² scaled to the game world (≈38% of the Earth-tuned value), used by the player inside and outside and by dust particles.
+- **NOVA Science Info cards**: the first time you use a science device, NOVA shows a card that separates REAL SCIENCE, INSPIRED BY NASA and IN THIS GAME (fictional/simulated). Afterwards the device opens directly; every device has a SCIENCE INFO button. Seen cards are saved.
+- **Devices**
+  - Weather terminal (Airlock) — simulated temperature, pressure (Pa), wind (m/s), dust activity and advisory per sol; inspired by MEDA on Perseverance. Labelled "SIMULATED MARS WEATHER — NOT LIVE DATA".
+  - Water Recovery System (Greenhouse) — used water → processing → filtration → recovered water; ISS ECLSS / WRS background (98% is the whole ISS system's recovery). The existing water decision and values are unchanged.
+  - Greenhouse planter — "ASK NOVA FOR HELP" gives 3 progressive hints; hint 3 reads the plant's real ranges from the game's plant data. Veggie / Advanced Plant Habitat background.
+  - Solar array — dust slowly builds up (simulated). Above 50% it costs 5 energy a day; brush it off outside or replay the mini-game.
+  - Rock Analyzer (Science Lab) — scan collected samples; simulated relative element levels and real mineral types; PIXL/SHERLOC background. Results go to the Research Journal; physical samples stay in the Lab cache on Mars.
+  - Scout drone (pad outside, from Day 6) — fly to Wind Ridge, photograph wind-carved rocks, the drone flies home; Ingenuity background (it carried cameras, not rock instruments).
+  - Suit radiation monitor (HUD chip) — dose rate (mSv/day), accumulated dose (mSv) from the simulated mission clock, and status. The outdoor rate uses the average reported from Curiosity's RAD; other values are simulated, with no invented safety thresholds.
+  - Earth Data Link (Comm Room) — choose a finished research report, review it, TRANSMIT RESEARCH DATA. Shows simulated distance (225 million km), one-way signal delay (distance ÷ 299,792.458 km/s ≈ 12 min 31 s), estimated arrival and status. Each report is sent once.
+- **Five mini-games** (Power Circuit, Oxygen System Repair, Solar Panel Alignment, Greenhouse Challenge, Antenna Signal), unchanged.
+- **Geology** instead of wildlife: regolith (soil), layered sedimentary rock, basalt and hematite spherules. Exploration areas: Solar Field, Rock Overhang, Frost Flats, Pebble Canyon, Wind Ridge, Dune Plains, Rock Arch.
+- **Ten days** with decisions (water source, how to sample the canyon, storm power plan) and **four endings**: Successful Mission, Survival First, Damaged Research Sites, Mission Failed.
+- **NOVA Engineering Journal**: after the Mission Report each night, NOVA shows a short engineering report — Decisions Made, Resource Usage (energy, oxygen, water used and made, with causes), Systems at Risk, NOVA's Analysis and an Engineering Lesson. It is built only from logged gameplay events, the day-start resource snapshot and the overnight upkeep (`src/data/engineering.ts`). Reports are saved and listed in Journal → ENGINEERING. After Day 10 (or a failed mission) a Final Mission Report sums up the expedition on the ending screen.
+- **Science Notes** screen (no links): what is real, NASA-inspired or simulated, plus every science card.
+- **Saving**: automatic, to LocalStorage. Saves from earlier versions still load.
+
+## Code layout
 
 ```
 src/
-  App.tsx, main.tsx, index.css    React shell + Tailwind theme
-  ui/                             Main menu, settings, pause, inventory/crafting, cutscene views
-  game/
-    Game.ts                       Main loop: actions, survival, spawning, cutscenes, saving, rendering order
-    world.ts                      Seeded tile world: terrain, caves, ores, trees, structures
-    tiles.ts, items.ts            Tile and item definitions, recipes, inventory
-    physics.ts                    AABB vs tile collision with ledge step-up
-    player.ts, robot.ts, creatures.ts
-    story.ts                      The ten days: objectives, dialogue, waypoints
-    hud.ts, font.ts               Canvas HUD and an original 5x7 bitmap font
-    render.ts                     Sky, parallax, tiles, objects, flood-fill lighting
-    audio.ts                      Procedural Web Audio music + sound effects
-    IntroScene.ts, EndingScene.ts, MenuScene.ts, planet.ts
-    art/                          All pixel art, generated in code (no image files)
-    save.ts, settings.ts          LocalStorage persistence
+  App.tsx                 screens: about (first launch) → menu → intro → game
+  store/                  one shared game state (types + store with autosave, missions, rewards, day cycle)
+  data/                   days, missions, geology, science cards, radiation clock, mini-game text, upgrades/items
+  game/                   canvas engine: World, BaseScene, ExploreScene (incl. scout drone), IntroScene, MenuScene,
+                          pixel art (art/), audio synth, bitmap font, physics (Mars gravity constants)
+  minigames/              the five mini-games (React + canvas)
+  ui/                     HUD, dialogue, screens, Devices.tsx (science cards, weather, water, analyzer,
+                          dosimeter, data link, about), mini-game shell, ending
+docs/SCIENCE_NOTES.md     developer references for every scientific statement (not shown in the game)
 ```
+
+All pixel art is drawn in code and all sound is synthesized with Web Audio, so there are no asset files.
 
 ## Notes
 
-- Engine: the spec asked for Phaser 3, but this build environment couldn't install packages, so the game runs on a small custom canvas engine written in TypeScript (fixed-step-ish loop, tile physics, lighting). Gameplay code is split into modules so it could be ported to Phaser scenes later.
-- One in-game day ≈ 5 minutes (Day 1 runs at half speed until the SOS is sent; Day 9's night is extra long).
-- A day only advances at dawn once its objectives are done; you can sleep through the night in a lit, enclosed shelter (press E at your light source).
-- `window.__lostSignal` exposes the running game for debugging in the browser console.
+- `window.__aurelia`, `window.__world` and `window.__mg` are read-only debugging handles (the save keys keep their old names so existing saves still load).
+- The game never shows external links or citations; see `docs/SCIENCE_NOTES.md`.

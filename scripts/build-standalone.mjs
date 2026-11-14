@@ -65,7 +65,7 @@ const html = `<!doctype html>
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Lost Signal: 10 Days</title>
+<title>Lost Signal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet" />
@@ -78,7 +78,7 @@ const html = `<!doctype html>
 </html>`;
 await fs.mkdir(path.join(root, 'dist-standalone'), { recursive: true });
 await fs.writeFile(path.join(root, 'dist-standalone/index.html'), html);
-const fragment = `<title>Lost Signal: 10 Days</title>
+const fragment = `<title>Lost Signal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet" />
